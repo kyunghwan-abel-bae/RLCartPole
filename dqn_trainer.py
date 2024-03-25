@@ -89,6 +89,9 @@ class DQNTrainer:
                 current_state = next_state
                 steps += 1
 
+
+            self.epsilon = max(self.epsilon-self.epsilon_decay, self.min_epsilon)
+
             self.current_episode += 1
 
             if self.current_episode % 100 == 0:
