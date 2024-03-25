@@ -45,6 +45,7 @@ while running:
 
         score += reward
         print(f"score : {score}")
+        ## IMPORTANT : SAVING hyper parameters
 
         if render is True:
             # Rendering score part
