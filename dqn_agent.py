@@ -1,4 +1,7 @@
 import torch
+import random
+
+import numpy as np
 
 from torch import nn
 from collections import deque
@@ -50,7 +53,36 @@ class DQNAgent:
         q_values = self.model(x)
         return q_values.detach().numpy()
 
-    # def train(self):
-    #     if
+    def train(self):
+        if len(self.replay_memory) < self.min_replay_memory_size:
+            return
+
+        samples = random.sample(self.replay_memory, self.batch_size)
+        current_input = np.stack([sample[0] for sample in samples])
+        current_q_values = self.model(current_input)
+        current_q_values_clone = current_q_values.clone()
+
+        next_input = np.stack([sample[3] for sample in samples])
+        next_q_values = self.model(next_input)
+
+        for i, (current_state, action, reward, _, done) in enumerate(samples):
+            if done:
+                next_q_value = reward
+            else:
+                # print(f"next_q_values : {next_q_values}")
+                next_q_value = reward + self.gamma * torch.max(next_q_values[i])
+            current_q_values[i, action] = next_q_value
+
+        pred_tensor = current_q_values_clone
+        target_tensor = current_q_values
+
+        loss = self.loss_fn(pred_tensor, target_tensor)
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        return loss
+
 
 
