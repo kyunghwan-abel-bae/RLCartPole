@@ -107,3 +107,69 @@ class DQNTrainer:
     def save(self, file_name):
         str_name_save = self.save_dir + "/" + file_name
         torch.save(self.agent.model.state_dict(), str_name_save)
+
+    def load(self, file_name):
+        str_name_load = self.save_dir + "/" + file_name + ".pth"
+        self.agent.load(str_name_load)
+
+    def play(self, render_fps):
+        pygame.init()
+
+        SCREEN_WIDTH, SCREEN_HEIGHT = 1400, 400
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        pygame.display.set_caption('CartPole')
+        font = pygame.font.SysFont(None, 36)  # 기본 시스템 폰트, 크기 36
+
+        running = True
+        clock = pygame.time.Clock()
+        while running:
+            current_state = self.env.reset()
+            current_state = current_state[0]
+
+            done = False
+            steps = 0
+            score = 0
+            while not done and steps < self.max_steps:
+                screen.fill((255, 255, 255))
+
+                cart_x = SCREEN_WIDTH // 2 + int(current_state[0] * SCREEN_WIDTH / 2)
+                pole_top = SCREEN_HEIGHT // 2 - 100
+                pole_end_x = cart_x + int(np.sin(current_state[2]) * 100)
+                pole_end_y = pole_top - int(np.cos(current_state[2]) * 100)
+                pygame.draw.rect(screen, (0, 255, 0), [cart_x - 25, pole_top, 50, 10])  # 카트 그리기
+                pygame.draw.line(screen, (0, 0, 0), (cart_x, pole_top), (pole_end_x, pole_end_y), 2)  # 막대 그리기
+
+                with torch.no_grad():
+                    action = np.argmax(self.agent.get_q_values(current_state))
+
+                next_state, reward, done, truncated, info = self.env.step(action)
+
+                score += reward
+
+                current_state = next_state
+                steps += 1
+
+                # Rendering score part
+                score_text = font.render("Score: " + str(score), True, (0, 0, 0))  # 흰색 텍스트
+                score_rect = score_text.get_rect()
+                score_rect.bottomright = (SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10)  # 오른쪽 하단에 위치
+
+                # 화면에 스코어 텍스트 그리기
+                screen.blit(score_text, score_rect)
+
+                pygame.display.flip()  # 화면 업데이트
+
+                clock.tick(render_fps)  # arg frames per second
+
+                if done:
+                    pygame.display.set_caption("DONE")
+                    running = False
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+
+
+

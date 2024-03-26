@@ -90,5 +90,8 @@ class DQNAgent:
             self.target_model.load_state_dict(self.model.state_dict())
             self.target_update_counter = 0
 
+    def load(self, file_name):
+        self.model.load_state_dict(torch.load(file_name))
+        self.target_model.load_state_dict(torch.load(file_name))
 
 
