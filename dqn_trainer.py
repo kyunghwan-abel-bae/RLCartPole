@@ -95,8 +95,15 @@ class DQNTrainer:
 
             self.current_episode += 1
 
-            if self.current_episode % 100 == 0:
+            if self.enable_save and self.current_episode % self.save_freq == 0:
+                self.save("model_" + str(self.current_episode) + ".pth")
+
                 if score > max_score:
                     max_score = score
+                    self.save("best.pth")
 
                 print(f"Current Episode : {self.current_episode}, Epsilon : {self.epsilon}, Max score : {max_score}, score : {score}")
+
+    def save(self, file_name):
+        str_name_save = self.save_dir + "/" + file_name
+        torch.save(self.agent.model.state_dict(), str_name_save)

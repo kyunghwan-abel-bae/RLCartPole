@@ -6,7 +6,7 @@ parser.add_argument('--episodes', type=int, default=10000, help='the number of e
 parser.add_argument('--initial_epsilon', type=float, default=1.)
 parser.add_argument('--min_epsilon', type=float, default=0.1)
 parser.add_argument('--exploration_ratio', type=float, default=0.5)
-parser.add_argument('--max_steps', type=int, default=500)
+parser.add_argument('--max_steps', type=int, default=600)
 parser.add_argument('--render_freq', type=int, default=100)
 parser.add_argument('--enable_render', type=bool, default=False)
 parser.add_argument('--render_fps', type=int, default=20)
