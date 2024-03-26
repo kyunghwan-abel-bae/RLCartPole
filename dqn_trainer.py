@@ -89,6 +89,7 @@ class DQNTrainer:
                 current_state = next_state
                 steps += 1
 
+            self.agent.increase_target_update_encounter()
 
             self.epsilon = max(self.epsilon-self.epsilon_decay, self.min_epsilon)
 

@@ -63,7 +63,7 @@ class DQNAgent:
         current_q_values_clone = current_q_values.clone()
 
         next_input = np.stack([sample[3] for sample in samples])
-        next_q_values = self.model(next_input)
+        next_q_values = self.target_model(next_input)
 
         for i, (current_state, action, reward, _, done) in enumerate(samples):
             if done:
@@ -83,6 +83,12 @@ class DQNAgent:
         self.optimizer.step()
 
         return loss
+
+    def increase_target_update_encounter(self):
+        self.target_update_counter += 1
+        if self.target_update_counter >= self.target_update_freq:
+            self.target_model.load_state_dict(self.model.state_dict())
+            self.target_update_counter = 0
 
 
 
